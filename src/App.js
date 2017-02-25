@@ -4,7 +4,7 @@ import './App.css';
 
 function Square(props) {
   return (
-    <button onClick={props.onClick} value={props.value}>YEah</button>
+    <button onClick={props.onClick} value={props.value}>{props.symbol}</button>
   )
 }
 
@@ -14,19 +14,22 @@ class Board extends React.Component {
     this.state = {
       squares: [0,0,0,0,0,0,0,0,0]
     }
+    this.handleClick = this.handleClick.bind(this)
   }
 
   handleClick(event) {
     event.preventDefault()
-    // var value = xIsNext ? 'X' : 'O';
     console.log(event.target.getAttribute('value'))
+    debugger
+    this.props.onEachClick().bind(this)
   }
 
   render() {
+    var symbol = this.props.xIsNext ? 'X' : 'O';
     return (
       <div>
         <div>
-        <Square value={this.state.squares[0]} onClick={this.handleClick}/>
+        <Square value={this.state.squares[0]} onClick={this.handleClick} symbol={symbol}/>
         <Square value={this.state.squares[1]} onClick={this.handleClick}/>
         <Square value={this.state.squares[2]} onClick={this.handleClick}/>
         </div>
@@ -54,7 +57,7 @@ class App extends Component {
     }
   }
 
-  handleClick(i) {
+  eachClick(i) {
     if (this.state.twoPlayer) {
       this.setState({xIsNext: !this.state.xIsNext})
     } else {
@@ -69,7 +72,7 @@ class App extends Component {
           <img src={logo} className="App-logo" alt="logo" />
           <h2>Play tic tac toe</h2>
         </div>
-        <Board twoPlayer={this.state.twoPlayer} eachClick={this.handleClick}/>
+        <Board onEachClick={this.eachClick}/>
       </div>
     );
   }
