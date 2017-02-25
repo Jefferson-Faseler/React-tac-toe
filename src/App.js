@@ -18,10 +18,7 @@ class Board extends React.Component {
   }
 
   handleClick(event) {
-    event.preventDefault()
-    console.log(event.target.getAttribute('value'))
-    debugger
-    this.props.onEachClick().bind(this)
+    this.props.onEachClick()
   }
 
   render() {
@@ -55,14 +52,16 @@ class App extends Component {
       twoPlayer: true,
       xIsNext: true
     }
+    this.eachClick = this.eachClick.bind(this)
   }
 
-  eachClick(i) {
+  eachClick() {
     if (this.state.twoPlayer) {
-      this.setState({xIsNext: !this.state.xIsNext})
+      //logic for recursion
     } else {
       // logic for computer
     }
+    this.setState({xIsNext: !this.state.xIsNext})
   }
 
   render() {
@@ -72,7 +71,7 @@ class App extends Component {
           <img src={logo} className="App-logo" alt="logo" />
           <h2>Play tic tac toe</h2>
         </div>
-        <Board onEachClick={this.eachClick}/>
+        <Board onEachClick={this.eachClick} twoPlayer={this.state.twoPlayer}/>
       </div>
     );
   }
