@@ -2,7 +2,11 @@ import React, { Component } from 'react';
 import logo from './logo.svg';
 import './App.css';
 
-
+function Square(props) {
+  return (
+    <button onClick={props.onClick} value={props.value}>YEah</button>
+  )
+}
 
 class Board extends React.Component {
   constructor() {
@@ -12,9 +16,9 @@ class Board extends React.Component {
     }
   }
 
-  handleClick() {
+  handleClick(event) {
     event.preventDefault()
-
+    console.log(event.target.getAttribute('value'))
   }
 
   render() {
@@ -23,7 +27,7 @@ class Board extends React.Component {
       {
         this.state.squares.map((square, i) => {
           return (
-            <Square key={i} />
+            <Square key={i} value={square} onClick={this.handleClick}/>
           )
         })
       }
