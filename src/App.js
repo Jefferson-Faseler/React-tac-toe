@@ -24,13 +24,21 @@ class Board extends React.Component {
   render() {
     return (
       <div>
-      {
-        this.state.squares.map((square, i) => {
-          return (
-            <Square key={i} value={square} onClick={this.handleClick}/>
-          )
-        })
-      }
+        <div>
+        <Square value={this.state.squares[0]} onClick={this.handleClick}/>
+        <Square value={this.state.squares[1]} onClick={this.handleClick}/>
+        <Square value={this.state.squares[2]} onClick={this.handleClick}/>
+        </div>
+        <div>
+        <Square value={this.state.squares[3]} onClick={this.handleClick}/>
+        <Square value={this.state.squares[4]} onClick={this.handleClick}/>
+        <Square value={this.state.squares[5]} onClick={this.handleClick}/>
+        </div>
+        <div>
+        <Square value={this.state.squares[6]} onClick={this.handleClick}/>
+        <Square value={this.state.squares[7]} onClick={this.handleClick}/>
+        <Square value={this.state.squares[8]} onClick={this.handleClick}/>
+        </div>
       </div>
     )
   }
