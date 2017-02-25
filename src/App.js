@@ -18,7 +18,7 @@ class Board extends React.Component {
 
   handleClick(event) {
     event.preventDefault()
-    var value = xIsNext ? return 'X' : 'O';
+    // var value = xIsNext ? 'X' : 'O';
     console.log(event.target.getAttribute('value'))
   }
 
@@ -45,24 +45,23 @@ class Board extends React.Component {
   }
 }
 
-class Game extends React.Component {
+class App extends Component {
   constructor() {
     super()
     this.state = {
+      twoPlayer: true,
       xIsNext: true
     }
   }
 
   handleClick(i) {
-    if (this.props.twoPlayer) {
-      this.setState(xIsNext: !this.state.xIsNext)
+    if (this.state.twoPlayer) {
+      this.setState({xIsNext: !this.state.xIsNext})
     } else {
       // logic for computer
     }
   }
-}
 
-class App extends Component {
   render() {
     return (
       <div className="App">
@@ -70,7 +69,7 @@ class App extends Component {
           <img src={logo} className="App-logo" alt="logo" />
           <h2>Play tic tac toe</h2>
         </div>
-        <Board />
+        <Board twoPlayer={this.state.twoPlayer} eachClick={this.handleClick}/>
       </div>
     );
   }
