@@ -18,6 +18,7 @@ class Board extends React.Component {
 
   handleClick(event) {
     event.preventDefault()
+    var value = xIsNext ? return 'X' : 'O';
     console.log(event.target.getAttribute('value'))
   }
 
@@ -41,6 +42,23 @@ class Board extends React.Component {
         </div>
       </div>
     )
+  }
+}
+
+class Game extends React.Component {
+  constructor() {
+    super()
+    this.state = {
+      xIsNext: true
+    }
+  }
+
+  handleClick(i) {
+    if (this.props.twoPlayer) {
+      this.setState(xIsNext: !this.state.xIsNext)
+    } else {
+      // logic for computer
+    }
   }
 }
 
