@@ -4,19 +4,6 @@ import Board from './Board';
 import './App.css';
 
 class App extends Component {
-  constructor() {
-    super()
-    this.state = {
-      xIsNext: true,
-      message: 'Make your move'
-    }
-    this.changeTurn = this.changeTurn.bind(this)
-  }
-
-  changeTurn(message) {
-    let turn = !this.state.xIsNext
-    this.setState({xIsNext: turn, message})
-  }
 
   render() {
     return (
@@ -26,13 +13,7 @@ class App extends Component {
           <h2 className="header-title">React-tac-toe</h2>
         </div>
         <div>
-          <Board
-          onChangeTurn={this.changeTurn}
-          turn={this.state.xIsNext ? 'X' : 'O'}
-          />
-        </div>
-        <div>
-        <h1>{this.state.message}</h1>
+          <Board />
         </div>
       </div>
     );
