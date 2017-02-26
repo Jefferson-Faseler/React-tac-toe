@@ -52,9 +52,9 @@ class Board extends React.Component {
     this.props.onEachClick()
     let message = this.checkForWin()
     if (message) {
-      this.setState({message: 'Game over'})
+      this.setState({message: 'Good job, ' + turn})
     } else {
-      this.setState({message: !this.props.xIsNext ? 'X' : 'O'})
+      this.setState({message: !this.props.xIsNext ? 'Your turn, X' : 'Go for it, O'})
     }
   }
 
