@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React from 'react';
 
 function Square(props) {
   return (
@@ -43,59 +43,70 @@ class Board extends React.Component {
   }
 
   checkForWin(turn) {
+    var message
     let gameOver = this.threeInRow(this.state.squares, turn)
     if (gameOver) {
-      var message = 'Good job, ' + turn
+      message = 'Good job, ' + turn
     } else {
       if (this.state.squares.includes(null)) {
-      var message = !this.state.xIsNext ? 'Your turn, X' : 'Go for it, O'
+      message = !this.state.xIsNext ? 'Your turn, X' : 'Go for it, O'
     } else {
-      var message = "Cat's game"
+      message = "Cat's game"
     }
     }
     return message
   }
 
-  minimax(board, playerSymbol, turns) {
+  minimax(board, playerSymbol, turns = 0) {
     var opponent = playerSymbol === 'X' ? 'O' : 'X'
 
-    if (this.checkForWin(opponent)) {
-      return -10
-    } else if (this.state.squares.includes(null)) {
+    if (this.threeInRow(board, opponent)) {
+      return -10 + turns
+    } else if (!this.state.squares.includes(null)) {
       return 0
     }
+    var max = -100
+    var index = 0
     for (var i = 0; i < 9; i++) {
       if (board[i] === null) {
         var tempBoard = board.slice()
         tempBoard[i] = playerSymbol
-
+        var moveRating = -this.minimax(tempBoard, opponent, turns + 1)
+        if (moveRating > max) {
+          max = moveRating
+          index = i
+        }
       }
     }
+    if (turns === 0) {
+      // values.index[Math.floor(Math.random()*moves.length)]
+      this.placeMark(document.getElementsByClassName('square')[index], playerSymbol)
+    }
+    return max
   }
 
-  placeMark(targetSquare) {
+  placeMark(targetSquare, symbol) {
     if (targetSquare.textContent === '' ) {
-      targetSquare.textContent = this.props.turn
+      targetSquare.textContent = symbol
       var square = Number(targetSquare.value)
       var symbols = this.state.squares
-      symbols[square] = this.props.turn
+      symbols[square] = symbol
       this.setState({squares: symbols})
     }
   }
 
   handleBoardClick(event) {
-    this.placeMark(event.target)
+    this.placeMark(event.target, this.props.turn)
     this.props.onChangeTurn(this.checkForWin(this.props.turn))
     if (this.state.computerPlaying) {
-      var computerMove = this.minimax(this.state.squares, this.state.computerSymbol)
-      this.props.onChangeTurn(this.checkForWin(this.props.turn))
+      this.minimax(this.state.squares, this.state.computerSymbol)
     }
   }
 
   handleAIClick() {
     this.setState({computerPlaying: true, computerSymbol: this.state.xIsNext ? 'X' : 'O'})
     if (this.state.squares.every(i => i === null)) {
-      this.placeMark(document.getElementsByTagName('BUTTON')[Math.floor(Math.random()*9)])
+      this.placeMark(document.getElementsByClassName('square')[Math.floor(Math.random()*9)], this.state.computerSymbol)
       this.props.onChangeTurn(this.checkForWin(this.props.turn))
     }
   }
@@ -104,7 +115,7 @@ class Board extends React.Component {
     return (
       <div>
       <div className="game-board">
-        <button onClick={this.handleAIClick}>Unbeatale AI</button>
+        <button onClick={this.handleAIClick}>Unbeatable AI</button>
         <div className={"board-row"}>
         <Square value={0} onClick={this.handleBoardClick} symbol={this.state.squares[0]} place={"square left"}/>
         <Square value={1} onClick={this.handleBoardClick} symbol={this.state.squares[1]} place={"square"}/>
