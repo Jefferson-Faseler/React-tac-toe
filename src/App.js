@@ -11,7 +11,7 @@ class App extends Component {
       xIsNext: true,
       message: 'Make your move'
     }
-    this.eachClick = this.eachClick.bind(this)
+    this.changeTurn = this.changeTurn.bind(this)
     this.handleClick = this.handleClick.bind(this)
   }
 
@@ -19,7 +19,7 @@ class App extends Component {
     this.setState({computerPlaying: true})
   }
 
-  eachClick(message) {
+  changeTurn(message) {
     let turn = !this.state.xIsNext
     this.setState({xIsNext: turn, message})
   }
@@ -34,9 +34,9 @@ class App extends Component {
         <button onClick={this.handleClick}>Unbeatale AI</button>
         <div>
           <Board
-          onEachClick={this.eachClick}
+          onChangeTurn={this.changeTurn}
           computerPlaying={this.state.computerPlaying}
-          xIsNext={this.state.xIsNext}
+          turn={this.state.xIsNext ? 'X' : 'O'}
           />
         </div>
         <div>

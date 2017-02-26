@@ -15,6 +15,7 @@ class Board extends React.Component {
     this.handleClick = this.handleClick.bind(this)
     this.checkForWin = this.checkForWin.bind(this)
     this.minimax = this.minimax.bind(this)
+    this.placeMark = this.placeMark.bind(this)
   }
 
   checkForWin(squares, turn) {
@@ -35,6 +36,16 @@ class Board extends React.Component {
       }
     }
     return false
+  }
+
+  ifWinner(turn) {
+    let gameOver = this.checkForWin(this.state.squares, turn)
+    if (gameOver) {
+      var message = 'Good job, ' + turn
+    } else {
+      var message = !this.state.xIsNext ? 'Your turn, X' : 'Go for it, O'
+    }
+    return message
   }
 
   minimax(board, player) {
@@ -89,25 +100,23 @@ class Board extends React.Component {
     return moves[bestMove];
   }
 
-  handleClick(event) {
-    var turn = this.props.xIsNext ? 'X' : 'O'
-    if (event.target.textContent === '' ) {
-      event.target.textContent = turn
-      var square = Number(event.target.value)
+  placeMark(targetSquare) {
+    if (targetSquare.textContent === '' ) {
+      targetSquare.textContent = this.props.turn
+      var square = Number(targetSquare.value)
       var symbols = this.state.squares
-      symbols[square] = turn
+      symbols[square] = this.props.turn
       this.setState({squares: symbols})
     }
+  }
+
+  handleClick(event) {
+    this.placeMark(event.target)
+    this.props.onChangeTurn(this.ifWinner(this.props.turn))
     if (this.props.computerPlaying) {
       var computerMove = this.minimax(this.state.squares, 'X')
     }
-    let gameOver = this.checkForWin(this.state.squares, turn)
-    if (gameOver) {
-      var message = 'Good job, ' + turn
-    } else {
-      var message = !this.state.xIsNext ? 'Your turn, X' : 'Go for it, O'
-    }
-    this.props.onEachClick(message)
+    this.props.onChangeTurn(this.ifWinner(this.props.turn))
   }
 
   render() {
