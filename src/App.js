@@ -4,7 +4,7 @@ import './App.css';
 
 function Square(props) {
   return (
-    <button onClick={props.onClick} value={props.value}>{props.symbol}</button>
+    <button onClick={props.onClick} value={props.value} className={props.place}>{props.symbol}</button>
   )
 }
 
@@ -34,7 +34,6 @@ class Board extends React.Component {
     for (var line = 0; line < winConditions.length; line++) {
       const [a,b,c] = winConditions[line]
       if (this.state.symbols[a] && this.state.symbols[a] === this.state.symbols[b] && this.state.symbols[a] === this.state.symbols[c]) {
-        debugger
         return true
       }
     }
@@ -55,30 +54,31 @@ class Board extends React.Component {
     if (message) {
       this.setState({message: 'Game over'})
     } else {
-      this.setState({message: turn})
+      this.setState({message: !this.props.xIsNext ? 'X' : 'O'})
     }
   }
 
   render() {
     return (
       <div>
-        <div>
-        <Square value={0} onClick={this.handleClick} symbol={this.state.symbols[0]}/>
-        <Square value={1} onClick={this.handleClick} symbol={this.state.symbols[1]} />
-        <Square value={2} onClick={this.handleClick} symbol={this.state.symbols[2]} />
+      <div className="game-board">
+        <div className={"board-row"}>
+        <Square value={0} onClick={this.handleClick} symbol={this.state.symbols[0]} place={"square left"}/>
+        <Square value={1} onClick={this.handleClick} symbol={this.state.symbols[1]} place={"square"}/>
+        <Square value={2} onClick={this.handleClick} symbol={this.state.symbols[2]} place={"square right"}/>
         </div>
-        <div>
-        <Square value={3} onClick={this.handleClick} symbol={this.state.symbols[3]} />
-        <Square value={4} onClick={this.handleClick} symbol={this.state.symbols[4]} />
-        <Square value={5} onClick={this.handleClick} symbol={this.state.symbols[5]} />
+        <div className={"board-row center"}>
+        <Square value={3} onClick={this.handleClick} symbol={this.state.symbols[3]} place={"square left"}/>
+        <Square value={4} onClick={this.handleClick} symbol={this.state.symbols[4]} place={"square"}/>
+        <Square value={5} onClick={this.handleClick} symbol={this.state.symbols[5]} place={"square right"}/>
         </div>
-        <div>
-        <Square value={6} onClick={this.handleClick} symbol={this.state.symbols[6]} />
-        <Square value={7} onClick={this.handleClick} symbol={this.state.symbols[7]} />
-        <Square value={8} onClick={this.handleClick} symbol={this.state.symbols[8]} />
+        <div className={"board-row"}>
+        <Square value={6} onClick={this.handleClick} symbol={this.state.symbols[6]} place={"square left"}/>
+        <Square value={7} onClick={this.handleClick} symbol={this.state.symbols[7]} place={"square"}/>
+        <Square value={8} onClick={this.handleClick} symbol={this.state.symbols[8]} place={"square right"}/>
         </div>
-
-        <h1>{this.state.message}</h1>
+      </div>
+      <h1>{this.state.message}</h1>
       </div>
     )
   }
@@ -110,11 +110,13 @@ class App extends Component {
           <img src={logo} className="App-logo" alt="logo" />
           <h2>Play tic tac toe</h2>
         </div>
-        <Board
-        onEachClick={this.eachClick}
-        computerPlaying={this.state.computerPlaying}
-        xIsNext={this.state.xIsNext}
-        />
+        <div>
+          <Board
+          onEachClick={this.eachClick}
+          computerPlaying={this.state.computerPlaying}
+          xIsNext={this.state.xIsNext}
+          />
+        </div>
       </div>
     );
   }
