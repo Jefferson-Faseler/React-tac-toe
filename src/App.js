@@ -7,16 +7,10 @@ class App extends Component {
   constructor() {
     super()
     this.state = {
-      computerSymbol: '',
       xIsNext: true,
       message: 'Make your move'
     }
     this.changeTurn = this.changeTurn.bind(this)
-    this.handleClick = this.handleClick.bind(this)
-  }
-
-  handleClick() {
-    this.setState({computerSymbol: this.state.xIsNext ? 'X' : 'O'})
   }
 
   changeTurn(message) {
@@ -31,11 +25,11 @@ class App extends Component {
           <img src={logo} className="App-logo" alt="logo" />
           <h2 className="header-title">React-tac-toe</h2>
         </div>
-        <button onClick={this.handleClick}>Unbeatale AI</button>
         <div>
           <Board
           onChangeTurn={this.changeTurn}
           computerSymbol={this.state.computerSymbol}
+          computerPlaying={this.state.computerPlaying}
           turn={this.state.xIsNext ? 'X' : 'O'}
           />
         </div>

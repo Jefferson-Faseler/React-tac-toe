@@ -11,14 +11,18 @@ class Board extends React.Component {
     super()
     this.state = {
       squares: Array(9).fill(null),
+      computerSymbol: '',
+      computerPlaying: false
     }
-    this.handleClick = this.handleClick.bind(this)
-    this.checkForWin = this.checkForWin.bind(this)
+    this.handleBoardClick = this.handleBoardClick.bind(this)
+    this.handleAIClick = this.handleAIClick.bind(this)
+    this.threeInRow = this.threeInRow.bind(this)
+    this.checkForWin = this.threeInRow.bind(this)
     this.minimax = this.minimax.bind(this)
     this.placeMark = this.placeMark.bind(this)
   }
 
-  checkForWin(squares, turn) {
+  threeInRow(squares, turn) {
     const winConditions = [
     [0, 1, 2],
     [3, 4, 5],
@@ -38,8 +42,8 @@ class Board extends React.Component {
     return false
   }
 
-  ifWinner(turn) {
-    let gameOver = this.checkForWin(this.state.squares, turn)
+  checkForWin(turn) {
+    let gameOver = this.threeInRow(this.state.squares, turn)
     if (gameOver) {
       var message = 'Good job, ' + turn
     } else {
@@ -52,55 +56,21 @@ class Board extends React.Component {
     return message
   }
 
-  minimax(board, playerSymbol) {
+  minimax(board, playerSymbol, turns) {
     var opponent = playerSymbol === 'X' ? 'O' : 'X'
-    var emptySquares = board.filter(s => s != "O" && s != "X")
-    debugger
-    if (emptySquares.length === 0){
-      return {score:0};
-    } else if (this.checkForWin(board, opponent)){
-       return {score:-10};
-    } else if (this.checkForWin(board, playerSymbol)){
-      return {score:10};
+
+    if (this.checkForWin(opponent)) {
+      return -10
+    } else if (this.state.squares.includes(null)) {
+      return 0
     }
+    for (var i = 0; i < 9; i++) {
+      if (board[i] === null) {
+        var tempBoard = board.slice()
+        tempBoard[i] = playerSymbol
 
-    var moves = []
-
-    for (var i = 0; i < emptySquares.length; i++) {
-      var move = {};
-      board[emptySquares[i]] = playerSymbol
-
-      if (playerSymbol === 'X') {
-        var result = this.minimax(board, 'X')
-        move.score = result.score
-      } else {
-        var result = this.minimax(board, 'O')
-        move.score = result.score
       }
-      board[emptySquares[i]] = null
-      moves.push(move)
     }
-
-    var bestMove;
-      if(playerSymbol === 'X'){
-        var bestScore = -10000;
-        for(var i = 0; i < moves.length; i++){
-          if(moves[i].score > bestScore){
-            bestScore = moves[i].score;
-            bestMove = i;
-          }
-        }
-      }else{
-
-        var bestScore = 10000;
-        for(var i = 0; i < moves.length; i++){
-          if(moves[i].score < bestScore){
-            bestScore = moves[i].score;
-            bestMove = i;
-          }
-        }
-      }
-    return moves[bestMove];
   }
 
   placeMark(targetSquare) {
@@ -113,33 +83,42 @@ class Board extends React.Component {
     }
   }
 
-  handleClick(event) {
+  handleBoardClick(event) {
     this.placeMark(event.target)
-    this.props.onChangeTurn(this.ifWinner(this.props.turn))
-    if (this.props.computerSymbol !== '') {
-      var computerMove = this.minimax(this.state.squares, this.props.computerSymbol)
+    this.props.onChangeTurn(this.checkForWin(this.props.turn))
+    if (this.state.computerPlaying) {
+      var computerMove = this.minimax(this.state.squares, this.state.computerSymbol)
+      this.props.onChangeTurn(this.checkForWin(this.props.turn))
     }
-    this.props.onChangeTurn(this.ifWinner(this.props.turn))
+  }
+
+  handleAIClick() {
+    this.setState({computerPlaying: true, computerSymbol: this.state.xIsNext ? 'X' : 'O'})
+    if (this.state.squares.every(i => i === null)) {
+      this.placeMark(document.getElementsByTagName('BUTTON')[Math.floor(Math.random()*9)])
+      this.props.onChangeTurn(this.checkForWin(this.props.turn))
+    }
   }
 
   render() {
     return (
       <div>
       <div className="game-board">
+        <button onClick={this.handleAIClick}>Unbeatale AI</button>
         <div className={"board-row"}>
-        <Square value={0} onClick={this.handleClick} symbol={this.state.squares[0]} place={"square left"}/>
-        <Square value={1} onClick={this.handleClick} symbol={this.state.squares[1]} place={"square"}/>
-        <Square value={2} onClick={this.handleClick} symbol={this.state.squares[2]} place={"square right"}/>
+        <Square value={0} onClick={this.handleBoardClick} symbol={this.state.squares[0]} place={"square left"}/>
+        <Square value={1} onClick={this.handleBoardClick} symbol={this.state.squares[1]} place={"square"}/>
+        <Square value={2} onClick={this.handleBoardClick} symbol={this.state.squares[2]} place={"square right"}/>
         </div>
         <div className={"board-row center"}>
-        <Square value={3} onClick={this.handleClick} symbol={this.state.squares[3]} place={"square left"}/>
-        <Square value={4} onClick={this.handleClick} symbol={this.state.squares[4]} place={"square"}/>
-        <Square value={5} onClick={this.handleClick} symbol={this.state.squares[5]} place={"square right"}/>
+        <Square value={3} onClick={this.handleBoardClick} symbol={this.state.squares[3]} place={"square left"}/>
+        <Square value={4} onClick={this.handleBoardClick} symbol={this.state.squares[4]} place={"square"}/>
+        <Square value={5} onClick={this.handleBoardClick} symbol={this.state.squares[5]} place={"square right"}/>
         </div>
         <div className={"board-row"}>
-        <Square value={6} onClick={this.handleClick} symbol={this.state.squares[6]} place={"square left"}/>
-        <Square value={7} onClick={this.handleClick} symbol={this.state.squares[7]} place={"square"}/>
-        <Square value={8} onClick={this.handleClick} symbol={this.state.squares[8]} place={"square right"}/>
+        <Square value={6} onClick={this.handleBoardClick} symbol={this.state.squares[6]} place={"square left"}/>
+        <Square value={7} onClick={this.handleBoardClick} symbol={this.state.squares[7]} place={"square"}/>
+        <Square value={8} onClick={this.handleBoardClick} symbol={this.state.squares[8]} place={"square right"}/>
         </div>
       </div>
       </div>
