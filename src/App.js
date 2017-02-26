@@ -28,8 +28,6 @@ class App extends Component {
         <div>
           <Board
           onChangeTurn={this.changeTurn}
-          computerSymbol={this.state.computerSymbol}
-          computerPlaying={this.state.computerPlaying}
           turn={this.state.xIsNext ? 'X' : 'O'}
           />
         </div>

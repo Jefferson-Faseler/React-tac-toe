@@ -17,7 +17,7 @@ class Board extends React.Component {
     this.handleBoardClick = this.handleBoardClick.bind(this)
     this.handleAIClick = this.handleAIClick.bind(this)
     this.threeInRow = this.threeInRow.bind(this)
-    this.checkForWin = this.threeInRow.bind(this)
+    this.checkForWin = this.checkForWin.bind(this)
     this.minimax = this.minimax.bind(this)
     this.placeMark = this.placeMark.bind(this)
   }
@@ -43,18 +43,15 @@ class Board extends React.Component {
   }
 
   checkForWin(turn) {
-    var message
     let gameOver = this.threeInRow(this.state.squares, turn)
+
     if (gameOver) {
-      message = 'Good job, ' + turn
+      return 'Good job, ' + turn
+    } else if (this.state.squares.includes(null)) {
+      return this.props.turn === 'X' ? 'Your turn, X' : 'Go for it, O'
     } else {
-      if (this.state.squares.includes(null)) {
-      message = !this.state.xIsNext ? 'Your turn, X' : 'Go for it, O'
-    } else {
-      message = "Cat's game"
+      return "Cat's game"
     }
-    }
-    return message
   }
 
   minimax(board, playerSymbol, turns = 0) {
@@ -99,12 +96,15 @@ class Board extends React.Component {
     this.placeMark(event.target, this.props.turn)
     this.props.onChangeTurn(this.checkForWin(this.props.turn))
     if (this.state.computerPlaying) {
-      this.minimax(this.state.squares, this.state.computerSymbol)
+      setTimeout(function() {
+        this.setState({computerSymbol: this.state.turn})
+        this.minimax(this.state.squares, this.state.computerSymbol)
+    }.bind(this), 1000)
     }
   }
 
   handleAIClick() {
-    this.setState({computerPlaying: true, computerSymbol: this.state.xIsNext ? 'X' : 'O'})
+    this.setState({computerPlaying: true, computerSymbol: this.state.turn})
     if (this.state.squares.every(i => i === null)) {
       this.placeMark(document.getElementsByClassName('square')[Math.floor(Math.random()*9)], this.state.computerSymbol)
       this.props.onChangeTurn(this.checkForWin(this.props.turn))
