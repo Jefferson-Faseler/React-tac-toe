@@ -12,15 +12,14 @@ class Board extends React.Component {
   constructor() {
     super()
     this.state = {
-      squares: Array(9).fill(0),
-      symbols: Array(9).fill(null),
-      message: 'Make your move'
+      squares: Array(9).fill(null),
     }
     this.handleClick = this.handleClick.bind(this)
     this.checkForWin = this.checkForWin.bind(this)
+    this.minimax = this.minimax.bind(this)
   }
 
-  checkForWin() {
+  checkForWin(squares, turn) {
     const winConditions = [
     [0, 1, 2],
     [3, 4, 5],
@@ -33,11 +32,41 @@ class Board extends React.Component {
     ]
     for (var line = 0; line < winConditions.length; line++) {
       const [a,b,c] = winConditions[line]
-      if (this.state.symbols[a] && this.state.symbols[a] === this.state.symbols[b] && this.state.symbols[a] === this.state.symbols[c]) {
+      if (squares[a] === turn && squares[a] === squares[b] && squares[a] === squares[c]) {
         return true
       }
     }
     return false
+  }
+
+  minimax(board, player) {
+    if (this.props.computerPlaying) {
+      var emptySquares = board.filter(s => s != "O" && s != "X")
+
+      if (emptySquares.length === 0){
+        return {score:0};
+      } else if (this.checkForWin(board, 'O')){
+         return {score:-10};
+      } else if (this.checkForWin(board, 'X')){
+        return {score:10};
+      }
+      
+      var moves = []
+
+      for (var i = 0; i < emptySquares.length; i++) {
+        var move = {};
+        newBoard[emptySquares[i]] = player
+
+        if (player === 'X') {
+          var result = minimax(board, 'X')
+          move.score = result.score
+        } else {
+          var result = minimax(board, 'O')
+          move.score = result.score
+        }
+          moves.push(move)
+      }
+    }
   }
 
   handleClick(event) {
@@ -45,17 +74,18 @@ class Board extends React.Component {
     if (event.target.textContent === '' ) {
       event.target.textContent = turn
       var square = Number(event.target.value)
-      var symbols = this.state.symbols
+      var symbols = this.state.squares
       symbols[square] = turn
-      this.setState({symbols: symbols})
+      this.setState({squares: symbols})
     }
-    this.props.onEachClick()
-    let message = this.checkForWin()
-    if (message) {
-      this.setState({message: 'Good job, ' + turn})
+    minimax(this.state.squares, 'X')
+    let gameOver = this.checkForWin(this.state.squares, turn)
+    if (gameOver) {
+      let message = 'Good job, ' + turn
     } else {
-      this.setState({message: !this.props.xIsNext ? 'Your turn, X' : 'Go for it, O'})
+      let message = !this.state.xIsNext ? 'Your turn, X' : 'Go for it, O'
     }
+    this.props.onEachClick(message)
   }
 
   render() {
@@ -63,23 +93,20 @@ class Board extends React.Component {
       <div>
       <div className="game-board">
         <div className={"board-row"}>
-        <Square value={0} onClick={this.handleClick} symbol={this.state.symbols[0]} place={"square left"}/>
-        <Square value={1} onClick={this.handleClick} symbol={this.state.symbols[1]} place={"square"}/>
-        <Square value={2} onClick={this.handleClick} symbol={this.state.symbols[2]} place={"square right"}/>
+        <Square value={0} onClick={this.handleClick} symbol={this.state.squares[0]} place={"square left"}/>
+        <Square value={1} onClick={this.handleClick} symbol={this.state.squares[1]} place={"square"}/>
+        <Square value={2} onClick={this.handleClick} symbol={this.state.squares[2]} place={"square right"}/>
         </div>
         <div className={"board-row center"}>
-        <Square value={3} onClick={this.handleClick} symbol={this.state.symbols[3]} place={"square left"}/>
-        <Square value={4} onClick={this.handleClick} symbol={this.state.symbols[4]} place={"square"}/>
-        <Square value={5} onClick={this.handleClick} symbol={this.state.symbols[5]} place={"square right"}/>
+        <Square value={3} onClick={this.handleClick} symbol={this.state.squares[3]} place={"square left"}/>
+        <Square value={4} onClick={this.handleClick} symbol={this.state.squares[4]} place={"square"}/>
+        <Square value={5} onClick={this.handleClick} symbol={this.state.squares[5]} place={"square right"}/>
         </div>
         <div className={"board-row"}>
-        <Square value={6} onClick={this.handleClick} symbol={this.state.symbols[6]} place={"square left"}/>
-        <Square value={7} onClick={this.handleClick} symbol={this.state.symbols[7]} place={"square"}/>
-        <Square value={8} onClick={this.handleClick} symbol={this.state.symbols[8]} place={"square right"}/>
+        <Square value={6} onClick={this.handleClick} symbol={this.state.squares[6]} place={"square left"}/>
+        <Square value={7} onClick={this.handleClick} symbol={this.state.squares[7]} place={"square"}/>
+        <Square value={8} onClick={this.handleClick} symbol={this.state.squares[8]} place={"square right"}/>
         </div>
-      </div>
-      <h1>{this.state.message}</h1>
-      </div>
     )
   }
 }
@@ -89,18 +116,15 @@ class App extends Component {
     super()
     this.state = {
       computerPlaying: false,
-      xIsNext: true
+      xIsNext: true,
+      message: 'Make your move'
     }
     this.eachClick = this.eachClick.bind(this)
   }
 
-  eachClick() {
-    if (this.state.computerPlaying) {
-      // logic for computer
-      // logic for recursion
-    }
+  eachClick(message) {
     let turn = !this.state.xIsNext
-    this.setState({xIsNext: turn})
+    this.setState({xIsNext: turn, message})
   }
 
   render() {
@@ -116,6 +140,9 @@ class App extends Component {
           computerPlaying={this.state.computerPlaying}
           xIsNext={this.state.xIsNext}
           />
+        </div>
+        </div>
+        <h1>{this.state.message}</h1>
         </div>
       </div>
     );
