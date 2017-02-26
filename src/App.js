@@ -7,7 +7,7 @@ class App extends Component {
   constructor() {
     super()
     this.state = {
-      computerPlaying: false,
+      computerSymbol: '',
       xIsNext: true,
       message: 'Make your move'
     }
@@ -16,7 +16,7 @@ class App extends Component {
   }
 
   handleClick() {
-    this.setState({computerPlaying: true})
+    this.setState({computerSymbol: this.state.xIsNext ? 'X' : 'O'})
   }
 
   changeTurn(message) {
@@ -35,7 +35,7 @@ class App extends Component {
         <div>
           <Board
           onChangeTurn={this.changeTurn}
-          computerPlaying={this.state.computerPlaying}
+          computerSymbol={this.state.computerSymbol}
           turn={this.state.xIsNext ? 'X' : 'O'}
           />
         </div>

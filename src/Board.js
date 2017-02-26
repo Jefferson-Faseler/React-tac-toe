@@ -43,19 +43,24 @@ class Board extends React.Component {
     if (gameOver) {
       var message = 'Good job, ' + turn
     } else {
+      if (this.state.squares.includes(null)) {
       var message = !this.state.xIsNext ? 'Your turn, X' : 'Go for it, O'
+    } else {
+      var message = "Cat's game"
+    }
     }
     return message
   }
 
-  minimax(board, player) {
+  minimax(board, playerSymbol) {
+    var opponent = playerSymbol === 'X' ? 'O' : 'X'
     var emptySquares = board.filter(s => s != "O" && s != "X")
-
+    debugger
     if (emptySquares.length === 0){
       return {score:0};
-    } else if (this.checkForWin(board, 'O')){
+    } else if (this.checkForWin(board, opponent)){
        return {score:-10};
-    } else if (this.checkForWin(board, 'X')){
+    } else if (this.checkForWin(board, playerSymbol)){
       return {score:10};
     }
 
@@ -63,23 +68,21 @@ class Board extends React.Component {
 
     for (var i = 0; i < emptySquares.length; i++) {
       var move = {};
-      board[emptySquares[i]] = player
+      board[emptySquares[i]] = playerSymbol
 
-      if (player === 'X') {
+      if (playerSymbol === 'X') {
         var result = this.minimax(board, 'X')
         move.score = result.score
       } else {
         var result = this.minimax(board, 'O')
         move.score = result.score
       }
-        moves.push(move)
+      board[emptySquares[i]] = null
+      moves.push(move)
     }
-    return this.bestMove(moves, player)
-  }
 
-  bestMove(moves, player) {
     var bestMove;
-      if(player === 'X'){
+      if(playerSymbol === 'X'){
         var bestScore = -10000;
         for(var i = 0; i < moves.length; i++){
           if(moves[i].score > bestScore){
@@ -113,8 +116,8 @@ class Board extends React.Component {
   handleClick(event) {
     this.placeMark(event.target)
     this.props.onChangeTurn(this.ifWinner(this.props.turn))
-    if (this.props.computerPlaying) {
-      var computerMove = this.minimax(this.state.squares, 'X')
+    if (this.props.computerSymbol !== '') {
+      var computerMove = this.minimax(this.state.squares, this.props.computerSymbol)
     }
     this.props.onChangeTurn(this.ifWinner(this.props.turn))
   }
