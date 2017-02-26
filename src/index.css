@@ -3,3 +3,74 @@ body {
   padding: 0;
   font-family: sans-serif;
 }
+
+.game-board {
+  width: 358px;
+  margin-left: 37%;
+  margin-top: 5%;
+}
+
+.board-row:after {
+  clear: both;
+  content: "";
+  display: table;
+}
+
+button {
+  background: none;
+  border: none;
+}
+
+button:focus {
+  outline: none;
+  border-style: outset;
+  border: none;
+}
+
+button:active {
+  outline: none;
+  border-style: outset;
+}
+
+.center {
+  border-top: 5px solid #999;
+  border-bottom: 5px solid #999;
+}
+
+.square {
+  background: #fff;
+  float: left;
+  font-size: 24px;
+  font-weight: bold;
+  line-height: 34px;
+  height: 120px;
+  margin-right: -1px;
+  margin-top: -1px;
+  padding: 0;
+  text-align: center;
+  width: 120px;
+}
+
+.square:focus {
+  outline: none;
+  border-style: outset;
+  border: none;
+}
+
+.left {
+  border-right: 5px solid #999;
+}
+
+.right {
+  border-left: 5px solid #999;
+}
+
+.left:focus {
+  border: none;
+  border-right: 5px solid #999;
+}
+
+.right:focus {
+  border: none;
+  border-left: 5px solid #999;
+}
