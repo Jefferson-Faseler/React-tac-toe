@@ -1,3 +1,5 @@
+import React, { Component } from 'react';
+
 function Square(props) {
   return (
     <button onClick={props.onClick} value={props.value} className={props.place}>{props.symbol}</button>
@@ -50,18 +52,18 @@ class Board extends React.Component {
 
     for (var i = 0; i < emptySquares.length; i++) {
       var move = {};
-      newBoard[emptySquares[i]] = player
+      board[emptySquares[i]] = player
 
       if (player === 'X') {
-        var result = minimax(board, 'X')
+        var result = this.minimax(board, 'X')
         move.score = result.score
       } else {
-        var result = minimax(board, 'O')
+        var result = this.minimax(board, 'O')
         move.score = result.score
       }
         moves.push(move)
     }
-    return bestMove(moves, player)
+    return this.bestMove(moves, player)
   }
 
   bestMove(moves, player) {
@@ -84,8 +86,7 @@ class Board extends React.Component {
           }
         }
       }
-      return moves[bestMove];
-    }
+    return moves[bestMove];
   }
 
   handleClick(event) {
@@ -98,13 +99,13 @@ class Board extends React.Component {
       this.setState({squares: symbols})
     }
     if (this.props.computerPlaying) {
-      var computerMove = minimax(this.state.squares, 'X')
+      var computerMove = this.minimax(this.state.squares, 'X')
     }
     let gameOver = this.checkForWin(this.state.squares, turn)
     if (gameOver) {
-      let message = 'Good job, ' + turn
+      var message = 'Good job, ' + turn
     } else {
-      let message = !this.state.xIsNext ? 'Your turn, X' : 'Go for it, O'
+      var message = !this.state.xIsNext ? 'Your turn, X' : 'Go for it, O'
     }
     this.props.onEachClick(message)
   }
@@ -128,6 +129,10 @@ class Board extends React.Component {
         <Square value={7} onClick={this.handleClick} symbol={this.state.squares[7]} place={"square"}/>
         <Square value={8} onClick={this.handleClick} symbol={this.state.squares[8]} place={"square right"}/>
         </div>
+      </div>
+      </div>
     )
   }
 }
+
+export default Board;
