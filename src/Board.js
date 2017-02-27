@@ -140,8 +140,8 @@ class Board extends React.Component {
   render() {
     return (
       <div>
-        <button onClick={this.handleAIClick} className="header-title computer">Activate unbeatable AI</button>
-        <button onClick={this.resetGame} className="header-title computer">Reset Game</button>
+        <button onClick={this.handleAIClick} className="header-title controls">Activate unbeatable AI</button>
+        <button onClick={this.resetGame} className="header-title controls">Reset Game</button>
         <div id="game-board">
         <h1 className="header-title game-message">{this.state.message}</h1>
           <div className={"board-row"}>
