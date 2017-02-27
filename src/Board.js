@@ -56,7 +56,6 @@ class Board extends React.Component {
       message = 'Good job, ' + turn
     } else if (this.state.squares.includes(null)) {
       message = turn === 'O' ? 'Your turn, X' : 'Go for it, O'
-      console.log(message)
     } else {
       message = "Cat's game"
     }
@@ -102,14 +101,13 @@ class Board extends React.Component {
   }
 
   handleBoardClick(event) {
+    this.placeMark(event.target, this.state.turn)
     if (this.state.computerPlaying) {
-      var playerSymbol = this.state.turn
-      var computerSymbol = this.state.computerSymbol
-
-      this.placeMark(event.target, playerSymbol)
       setTimeout(function() {
-        this.minimax(this.state.squares, computerSymbol)
+        this.minimax(this.state.squares, this.state.computerSymbol)
       }.bind(this), 1000)
+    } else {
+      this.changeTurn()
     }
   }
 
@@ -117,6 +115,8 @@ class Board extends React.Component {
     this.setState({computerPlaying: true, computerSymbol: this.state.turn})
     if (this.state.squares.every(i => i === null)) {
       this.placeMark(document.getElementsByClassName('square')[Math.floor(Math.random()*9)], this.state.turn)
+    } else {
+      this.minimax(this.state.squares, this.state.turn)
     }
     this.changeTurn()
   }
