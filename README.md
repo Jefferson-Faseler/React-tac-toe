@@ -5,7 +5,9 @@ Tic tac toe using React
 ## To run
 
 clone repository and then use
+
 `npm install`
+
 `npm start`
 
 ## To play
