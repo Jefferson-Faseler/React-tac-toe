@@ -13,7 +13,8 @@ class Board extends React.Component {
       squares: Array(9).fill(null),
       turn: 'X',
       computerSymbol: '',
-      computerPlaying: false
+      computerPlaying: false,
+      message: 'Make your move'
     }
     this.handleBoardClick = this.handleBoardClick.bind(this)
     this.handleAIClick = this.handleAIClick.bind(this)
@@ -124,25 +125,25 @@ class Board extends React.Component {
   render() {
     return (
       <div>
-      <div className="game-board">
-        <button onClick={this.handleAIClick}>Unbeatable AI</button>
-        <div className={"board-row"}>
-        <Square value={0} onClick={this.handleBoardClick} symbol={this.state.squares[0]} place={"square left"}/>
-        <Square value={1} onClick={this.handleBoardClick} symbol={this.state.squares[1]} place={"square"}/>
-        <Square value={2} onClick={this.handleBoardClick} symbol={this.state.squares[2]} place={"square right"}/>
+        <button onClick={this.handleAIClick} className="header-title computer">Activate unbeatable AI</button>
+        <div className="game-board">
+        <h1 className="header-title game-message">{this.state.message}</h1>
+          <div className={"board-row"}>
+            <Square value={0} onClick={this.handleBoardClick} symbol={this.state.squares[0]} place={"square left"}/>
+            <Square value={1} onClick={this.handleBoardClick} symbol={this.state.squares[1]} place={"square"}/>
+            <Square value={2} onClick={this.handleBoardClick} symbol={this.state.squares[2]} place={"square right"}/>
+          </div>
+          <div className={"board-row center"}>
+            <Square value={3} onClick={this.handleBoardClick} symbol={this.state.squares[3]} place={"square left"}/>
+            <Square value={4} onClick={this.handleBoardClick} symbol={this.state.squares[4]} place={"square"}/>
+            <Square value={5} onClick={this.handleBoardClick} symbol={this.state.squares[5]} place={"square right"}/>
+          </div>
+          <div className={"board-row"}>
+            <Square value={6} onClick={this.handleBoardClick} symbol={this.state.squares[6]} place={"square left"}/>
+            <Square value={7} onClick={this.handleBoardClick} symbol={this.state.squares[7]} place={"square"}/>
+            <Square value={8} onClick={this.handleBoardClick} symbol={this.state.squares[8]} place={"square right"}/>
+          </div>
         </div>
-        <div className={"board-row center"}>
-        <Square value={3} onClick={this.handleBoardClick} symbol={this.state.squares[3]} place={"square left"}/>
-        <Square value={4} onClick={this.handleBoardClick} symbol={this.state.squares[4]} place={"square"}/>
-        <Square value={5} onClick={this.handleBoardClick} symbol={this.state.squares[5]} place={"square right"}/>
-        </div>
-        <div className={"board-row"}>
-        <Square value={6} onClick={this.handleBoardClick} symbol={this.state.squares[6]} place={"square left"}/>
-        <Square value={7} onClick={this.handleBoardClick} symbol={this.state.squares[7]} place={"square"}/>
-        <Square value={8} onClick={this.handleBoardClick} symbol={this.state.squares[8]} place={"square right"}/>
-        </div>
-      </div>
-        <h1>{this.state.message}</h1>
       </div>
     )
   }
