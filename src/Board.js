@@ -115,7 +115,7 @@ class Board extends React.Component {
 
   placeMark(targetSquare, symbol) {
     var square = Number(targetSquare.value)
-    var symbols = this.state.squares.slice()
+    var symbols = this.state.squares
 
     symbols[square] = symbol
 
