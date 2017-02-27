@@ -1,13 +1,32 @@
 body {
+  font-family: sans-serif;
   margin: 0;
   padding: 0;
-  font-family: sans-serif;
 }
 
-.game-board {
+.game-message {
+  margin-bottom: 25px;
+  margin-top: 0;
+  padding-top: 0;
+}
+
+.controls {
+  color: #4c4c4c;
+  float: right;
+  font-size: 15px;
+  text-decoration: underline;
+}
+
+.controls:focus {
+  border-style: outset;
+  border: none;
+  outline: none;
+}
+
+#game-board {
+  margin-left: 35%;
+  margin-top: 1%;
   width: 358px;
-  margin-left: 37%;
-  margin-top: 5%;
 }
 
 .board-row:after {
@@ -21,28 +40,17 @@ button {
   border: none;
 }
 
-button:focus {
-  outline: none;
-  border-style: outset;
-  border: none;
-}
-
-button:active {
-  outline: none;
-  border-style: outset;
-}
-
 .center {
-  border-top: 5px solid #999;
   border-bottom: 5px solid #999;
+  border-top: 5px solid #999;
 }
 
 .square {
   background: #fff;
   float: left;
   font-size: 95px;
-  line-height: 34px;
   height: 120px;
+  line-height: 34px;
   margin-right: -1px;
   margin-top: -1px;
   padding: 0;
@@ -51,9 +59,9 @@ button:active {
 }
 
 .square:focus {
-  outline: none;
   border-style: outset;
   border: none;
+  outline: none;
 }
 
 .left {
