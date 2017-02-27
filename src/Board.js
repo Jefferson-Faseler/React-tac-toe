@@ -17,7 +17,7 @@ class Board extends React.Component {
       message: 'Make your move'
     }
     this.handleBoardClick = this.handleBoardClick.bind(this)
-    this.activateAi = this.activateAi.bind(this)
+    this.activateAI = this.activateAI.bind(this)
     this.changeTurn = this.changeTurn.bind(this)
     this.threeInRow = this.threeInRow.bind(this)
     this.checkForWin = this.checkForWin.bind(this)
@@ -25,22 +25,6 @@ class Board extends React.Component {
     this.placeMark = this.placeMark.bind(this)
     this.resetGame = this.resetGame.bind(this)
   }
-
-  resetGame() {
-    this.setState({
-      squares: Array(9).fill(null),
-      turn: 'X',
-      computerSymbol: '',
-      computerPlaying: false,
-      message: 'Make your move'
-    })
-  }
-
-  changeTurn() {
-    let turn = this.state.turn === 'X' ? 'O' : 'X'
-    this.setState({turn})
-  }
-
 
   threeInRow(squares, turn) {
     const winConditions = [
@@ -65,6 +49,22 @@ class Board extends React.Component {
     return false
   }
 
+  resetGame() {
+    this.setState({
+      squares: Array(9).fill(null),
+      turn: 'X',
+      computerSymbol: '',
+      computerPlaying: false,
+      message: 'Make your move'
+    })
+    // enables board clicking
+    document.getElementById("game-board").removeAttribute("style", "pointer-events: none;")
+  }
+
+  changeTurn() {
+    let turn = this.state.turn === 'X' ? 'O' : 'X'
+    this.setState({turn})
+  }
 
   // changes game message state based upon game conditions
   checkForWin(turn) {
@@ -72,6 +72,10 @@ class Board extends React.Component {
     var message
     if (gameOver) {
       message = 'Good job, ' + turn
+
+      // disables board clicking until timeout is finished
+      document.getElementById("game-board").setAttribute("style", "pointer-events: none;")
+
     } else if (this.state.squares.includes(null)) {
       message = turn === 'O' ? 'Your turn, X' : 'Go for it, O'
     } else {
@@ -80,17 +84,45 @@ class Board extends React.Component {
     this.setState({message})
   }
 
+  minimax(board, playerSymbol, turns = 0) {
+    var opponent = playerSymbol === 'X' ? 'O' : 'X'
+
+    if (this.threeInRow(board, opponent)) {
+      return -10 + turns
+    } else if (board.includes(null) === false) {
+      return 0
+    }
+    var max = -Infinity
+    var index = 0
+    for (var i = 0; i < 9; i++) {
+      if (board[i] === null) {
+        var tempBoard = board.slice()
+        tempBoard[i] = playerSymbol
+        var moveRating = -this.minimax(tempBoard, opponent, turns + 1)
+        if (moveRating > max) {
+          max = moveRating
+          index = i
+        }
+      }
+    }
+    if (turns === 0) {
+      // finds the corresponding square from board with the index of the best move
+      // then passes that square and symbol to place the appropriate mark
+      this.placeMark(document.getElementsByClassName('square')[index], playerSymbol)
+    }
+    return max
+  }
 
   placeMark(targetSquare, symbol) {
     var square = Number(targetSquare.value)
-    var symbols = this.state.squares.slice() // shallow copy of board squares
+    var symbols = this.state.squares
 
+    targetSquare.textContent = symbol
     symbols[square] = symbol
 
     this.setState({squares: symbols})
     this.checkForWin(symbol)
   }
-
 
   // handles most functionality of app
   // finds if the square clicked is empty, if it is then
@@ -99,7 +131,6 @@ class Board extends React.Component {
   handleBoardClick(event) {
     if (event.target.textContent === '' ) {
       this.placeMark(event.target, this.state.turn)
-
       if (this.state.computerPlaying) {
         // disables board clicking until timeout is finished
         document.getElementById("game-board").setAttribute("style", "pointer-events: none;")
@@ -108,7 +139,7 @@ class Board extends React.Component {
         setTimeout(function() {
           this.minimax(this.state.squares, this.state.computerSymbol)
 
-          // enables board clicking again
+          // enables board clicking
           document.getElementById("game-board").removeAttribute("style", "pointer-events: none;")
         }.bind(this), 1000)
       } else {
@@ -117,8 +148,7 @@ class Board extends React.Component {
     }
   }
 
-
-  activateAi() {
+  activateAI() {
     this.setState({computerPlaying: true, computerSymbol: this.state.turn})
 
     // if nobody has played the computer places mark in random square
@@ -136,40 +166,10 @@ class Board extends React.Component {
     this.changeTurn()
   }
 
-
-    minimax(board, playerSymbol, turns = 0) {
-      var opponentSymbol = playerSymbol === 'X' ? 'O' : 'X'
-
-      if (this.threeInRow(board, opponentSymbol)) {
-        return -10 + turns
-      } else if (board.includes(null) === false) {
-        return 0
-      }
-      var bestMove = -Infinity
-      var index = 0
-      for (var i = 0; i < 9; i++) {
-        if (board[i] === null) {
-          var tempBoard = board.slice() //shallow copies board argument
-          tempBoard[i] = playerSymbol
-          var moveRating = -this.minimax(tempBoard, opponentSymbol, turns + 1)
-          if (moveRating > bestMove) { // replaces bestMove with moveRating if higher than previous bestMove
-            bestMove = moveRating
-            index = i
-          }
-        }
-      }
-      if (turns === 0) {
-        // finds the corresponding square from board with the index of the best move
-        // then passes that square and symbol to place the appropriate mark
-        this.placeMark(document.getElementsByClassName('square')[index], playerSymbol)
-      }
-      return bestMove
-    }
-
   render() {
     return (
       <div>
-        <button onClick={this.activateAi} className="header-title controls">Activate unbeatable AI</button>
+        <button onClick={this.activateAI} className="header-title controls">Activate unbeatable AI</button>
         <button onClick={this.resetGame} className="header-title controls">Reset Game</button>
         <div id="game-board">
         <h1 className="header-title game-message">{this.state.message}</h1>
