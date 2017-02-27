@@ -23,6 +23,7 @@ class Board extends React.Component {
     this.checkForWin = this.checkForWin.bind(this)
     this.minimax = this.minimax.bind(this)
     this.placeMark = this.placeMark.bind(this)
+    this.resetGame = this.resetGame.bind(this)
   }
 
   threeInRow(squares, turn) {
@@ -45,7 +46,17 @@ class Board extends React.Component {
     return false
   }
 
-  changeTurn(){
+  resetGame() {
+    this.setState({
+      squares: Array(9).fill(null),
+      turn: 'X',
+      computerSymbol: '',
+      computerPlaying: false,
+      message: 'Make your move'
+    })
+  }
+
+  changeTurn() {
     let turn = this.state.turn === 'X' ? 'O' : 'X'
     this.setState({turn})
   }
@@ -91,24 +102,28 @@ class Board extends React.Component {
   }
 
   placeMark(targetSquare, symbol) {
-    if (targetSquare.textContent === '' ) {
-      targetSquare.textContent = symbol
-      var square = Number(targetSquare.value)
-      var symbols = this.state.squares
-      symbols[square] = symbol
-      this.setState({squares: symbols})
-      this.checkForWin(symbol)
-    }
+    var square = Number(targetSquare.value)
+    var symbols = this.state.squares
+
+    targetSquare.textContent = symbol
+    symbols[square] = symbol
+
+    this.setState({squares: symbols})
+    this.checkForWin(symbol)
   }
 
   handleBoardClick(event) {
-    this.placeMark(event.target, this.state.turn)
-    if (this.state.computerPlaying) {
-      setTimeout(function() {
-        this.minimax(this.state.squares, this.state.computerSymbol)
-      }.bind(this), 1000)
-    } else {
-      this.changeTurn()
+    if (event.target.textContent === '' ) {
+      this.placeMark(event.target, this.state.turn)
+      if (this.state.computerPlaying) {
+        document.getElementById("game-board").setAttribute("style", "pointer-events: none;")
+        setTimeout(function() {
+          this.minimax(this.state.squares, this.state.computerSymbol)
+          document.getElementById("game-board").removeAttribute("style", "pointer-events: none;")
+        }.bind(this), 1000)
+      } else {
+        this.changeTurn()
+      }
     }
   }
 
@@ -126,7 +141,8 @@ class Board extends React.Component {
     return (
       <div>
         <button onClick={this.handleAIClick} className="header-title computer">Activate unbeatable AI</button>
-        <div className="game-board">
+        <button onClick={this.resetGame} className="header-title computer">Reset Game</button>
+        <div id="game-board">
         <h1 className="header-title game-message">{this.state.message}</h1>
           <div className={"board-row"}>
             <Square value={0} onClick={this.handleBoardClick} symbol={this.state.squares[0]} place={"square left"}/>

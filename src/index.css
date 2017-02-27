@@ -4,7 +4,7 @@ body {
   padding: 0;
 }
 
-.game-board {
+#game-board {
   margin-left: 35%;
   margin-top: 1%;
   width: 358px;
