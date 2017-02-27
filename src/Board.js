@@ -65,6 +65,22 @@ class Board extends React.Component {
     return false
   }
 
+  
+  resetGame() {
+    this.setState({
+      squares: Array(9).fill(null),
+      turn: 'X',
+      computerSymbol: '',
+      computerPlaying: false,
+      message: 'Make your move'
+    })
+  }
+
+  changeTurn() {
+    let turn = this.state.turn === 'X' ? 'O' : 'X'
+    this.setState({turn})
+  }
+
 
   // changes game message state based upon game conditions
   checkForWin(turn) {
@@ -108,7 +124,7 @@ class Board extends React.Component {
         setTimeout(function() {
           this.minimax(this.state.squares, this.state.computerSymbol)
 
-          // enables board clicking again
+          // enables board clicking
           document.getElementById("game-board").removeAttribute("style", "pointer-events: none;")
         }.bind(this), 1000)
       } else {
