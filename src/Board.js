@@ -79,7 +79,7 @@ class Board extends React.Component {
 
     if (this.threeInRow(board, opponent)) {
       return -10 + turns
-    } else if (!this.state.squares.includes(null)) {
+    } else if (board.includes(null) === false) {
       return 0
     }
     var max = -Infinity
