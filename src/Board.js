@@ -11,24 +11,55 @@ class Board extends React.Component {
     super()
     this.state = {
       squares: Array(9).fill(null),
-      turn: 'X',
+      currentSymbol: 'X',
       computerSymbol: '',
       computerPlaying: false,
       message: 'Make your move'
     }
-    this.handleBoardClick = this.handleBoardClick.bind(this)
-    this.activateAI = this.activateAI.bind(this)
-    this.changeTurn = this.changeTurn.bind(this)
-    this.threeInRow = this.threeInRow.bind(this)
-    this.checkForWin = this.checkForWin.bind(this)
-    this.minimax = this.minimax.bind(this)
-    this.placeMark = this.placeMark.bind(this)
     this.resetGame = this.resetGame.bind(this)
+    this.changeTurn = this.changeTurn.bind(this)
     this.startX = this.startX.bind(this)
     this.startO = this.startO.bind(this)
+    this.threeInRow = this.threeInRow.bind(this)
+    this.checkForWin = this.checkForWin.bind(this)
+    this.enableBoard = this.enableBoard.bind(this)
+    this.disableBoard = this.disableBoard.bind(this)
+    this.placeMark = this.placeMark.bind(this)
+    this.activateAI = this.activateAI.bind(this)
+    this.handleBoardClick = this.handleBoardClick.bind(this)
+    this.minimax = this.minimax.bind(this)
   }
 
-  threeInRow(squares, turn) {
+
+  resetGame() {
+    this.setState({
+      squares: Array(9).fill(null),
+      currentSymbol: 'X',
+      computerSymbol: '',
+      computerPlaying: false,
+      message: 'Make your move'
+    })
+    // enables board clicking
+    document.getElementById("game-board").removeAttribute("style", "pointer-events: none;")
+  }
+
+
+  changeTurn() {
+    let currentSymbol = this.state.currentSymbol === 'X' ? 'O' : 'X'
+    this.setState({currentSymbol})
+  }
+
+
+  startX() {
+    this.setState({currentSymbol: 'X'})
+  }
+
+  startO() {
+    this.setState({currentSymbol: 'O'})
+  }
+
+
+  threeInRow(squares, currentSymbol) {
     const winConditions = [
     [0, 1, 2],
     [3, 4, 5],
@@ -44,47 +75,94 @@ class Board extends React.Component {
       // game over if a,b,c indexes in the board contain the same
       // values as the current symbol
       const [a,b,c] = winConditions[line]
-      if (squares[a] === turn && squares[a] === squares[b] && squares[a] === squares[c]) {
+      if (squares[a] === currentSymbol && squares[a] === squares[b] && squares[a] === squares[c]) {
         return true
       }
     }
     return false
   }
 
-  resetGame() {
-    this.setState({
-      squares: Array(9).fill(null),
-      turn: 'X',
-      computerSymbol: '',
-      computerPlaying: false,
-      message: 'Make your move'
-    })
-    // enables board clicking
-    document.getElementById("game-board").removeAttribute("style", "pointer-events: none;")
-  }
-
-  changeTurn() {
-    let turn = this.state.turn === 'X' ? 'O' : 'X'
-    this.setState({turn})
-  }
 
   // changes game message state based upon game conditions
-  checkForWin(turn) {
-    let gameOver = this.threeInRow(this.state.squares, turn)
+  checkForWin(currentSymbol) {
+    let gameOver = this.threeInRow(this.state.squares, currentSymbol)
     var message
     if (gameOver) {
-      message = 'Good job, ' + turn
+      message = 'Good job, ' + currentSymbol
 
-      // disables board clicking until timeout is finished
-      document.getElementById("game-board").setAttribute("style", "pointer-events: none;")
+      this.disableBoard()
 
     } else if (this.state.squares.includes(null)) {
-      message = turn === 'O' ? 'Your turn, X' : 'Go for it, O'
+      message = currentSymbol === 'O' ? 'Your turn, X' : 'Go for it, O'
     } else {
       message = "Cat's game"
     }
     this.setState({message})
   }
+
+
+  enableBoard() {
+    document.getElementById("game-board").removeAttribute("style", "pointer-events: none;")
+  }
+
+  disableBoard() {
+    document.getElementById("game-board").setAttribute("style", "pointer-events: none;")
+  }
+
+
+  placeMark(targetSquare, symbol) {
+    var square = Number(targetSquare.value)
+    var symbols = this.state.squares
+
+    symbols[square] = symbol
+
+    this.setState({squares: symbols})
+    this.checkForWin(symbol)
+  }
+
+
+    activateAI() {
+      this.setState({computerPlaying: true, computerSymbol: this.state.currentSymbol})
+
+      // if nobody has played the computer places mark in random square
+      if (this.state.squares.every(i => i === null)) {
+
+        // selects random square and places mark
+        // state of currentSymbol is used because setState is asynchronous
+        this.placeMark(document.getElementsByClassName('square')[Math.floor(Math.random()*9)], this.state.currentSymbol)
+
+      } else {
+
+        // state of currentSymbol is used because setState is asynchronous
+        this.minimax(this.state.squares, this.state.currentSymbol)
+      }
+      this.changeTurn()
+    }
+
+
+  // handles most functionality of app
+  // finds if the square clicked is empty, if it is then
+  // appropriate symbol is placed in square and then
+  // if computer is activated it plays it's turn based on minimax minimal risk
+  handleBoardClick(event) {
+    if (event.target.textContent === '' ) {
+      this.placeMark(event.target, this.state.currentSymbol)
+      if (this.state.computerPlaying) {
+        this.disableBoard()
+
+        // wait effect for user experience
+        setTimeout(function() {
+          this.minimax(this.state.squares, this.state.computerSymbol)
+
+          // enables board clicking
+          this.enableBoard()
+        }.bind(this), 1000)
+      } else {
+        this.changeTurn()
+      }
+    }
+  }
+
 
   minimax(board, playerSymbol, turns = 0) {
     var opponent = playerSymbol === 'X' ? 'O' : 'X'
@@ -115,65 +193,6 @@ class Board extends React.Component {
     return max
   }
 
-  placeMark(targetSquare, symbol) {
-    var square = Number(targetSquare.value)
-    var symbols = this.state.squares
-
-    symbols[square] = symbol
-
-    this.setState({squares: symbols})
-    this.checkForWin(symbol)
-  }
-
-  startX() {
-    this.setState({turn: 'X'})
-  }
-
-  startO() {
-    this.setState({turn: 'O'})
-  }
-
-  // handles most functionality of app
-  // finds if the square clicked is empty, if it is then
-  // appropriate symbol is placed in square and then
-  // if computer is activated it plays it's turn based on minimax minimal risk
-  handleBoardClick(event) {
-    if (event.target.textContent === '' ) {
-      this.placeMark(event.target, this.state.turn)
-      if (this.state.computerPlaying) {
-        // disables board clicking until timeout is finished
-        document.getElementById("game-board").setAttribute("style", "pointer-events: none;")
-
-        // wait effect for user experience
-        setTimeout(function() {
-          this.minimax(this.state.squares, this.state.computerSymbol)
-
-          // enables board clicking
-          document.getElementById("game-board").removeAttribute("style", "pointer-events: none;")
-        }.bind(this), 1000)
-      } else {
-        this.changeTurn()
-      }
-    }
-  }
-
-  activateAI() {
-    this.setState({computerPlaying: true, computerSymbol: this.state.turn})
-
-    // if nobody has played the computer places mark in random square
-    if (this.state.squares.every(i => i === null)) {
-
-      // selects random square and places mark
-      // state of turn is used because setState is asynchronous
-      this.placeMark(document.getElementsByClassName('square')[Math.floor(Math.random()*9)], this.state.turn)
-
-    } else {
-
-      // state of turn is used because setState is asynchronous
-      this.minimax(this.state.squares, this.state.turn)
-    }
-    this.changeTurn()
-  }
 
   render() {
     var chooseSymbol
