@@ -138,7 +138,7 @@ class Board extends React.Component {
       }
       this.changeTurn()
     }
-
+  
 
   // handles most functionality of app
   // finds if the square clicked is empty, if it is then
