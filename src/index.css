@@ -18,6 +18,10 @@ body {
   margin-right: 10px;
 }
 
+.controls:hover {
+  color: #000;
+}
+
 .controls:focus {
   border-style: outset;
   border: none;
