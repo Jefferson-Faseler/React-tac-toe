@@ -24,6 +24,8 @@ class Board extends React.Component {
     this.minimax = this.minimax.bind(this)
     this.placeMark = this.placeMark.bind(this)
     this.resetGame = this.resetGame.bind(this)
+    this.startX = this.startX.bind(this)
+    this.startO = this.startO.bind(this)
   }
 
   threeInRow(squares, turn) {
@@ -123,6 +125,14 @@ class Board extends React.Component {
     this.checkForWin(symbol)
   }
 
+  startX() {
+    this.setState({turn: 'X'})
+  }
+
+  startO() {
+    this.setState({turn: 'O'})
+  }
+
   // handles most functionality of app
   // finds if the square clicked is empty, if it is then
   // appropriate symbol is placed in square and then
@@ -170,6 +180,8 @@ class Board extends React.Component {
       <div>
         <button onClick={this.activateAI} className="header-title controls">Activate unbeatable AI</button>
         <button onClick={this.resetGame} className="header-title controls">Reset Game</button>
+        <button onClick={this.startX} className="header-title controls">Play as X</button>
+        <button onClick={this.startO} className="header-title controls">Play as O</button>
         <div id="game-board">
         <h1 className="header-title game-message">{this.state.message}</h1>
           <div className={"board-row"}>
