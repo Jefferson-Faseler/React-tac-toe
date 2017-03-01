@@ -178,10 +178,10 @@ class Board extends React.Component {
   render() {
     return (
       <div>
-        <button onClick={this.activateAI} className="header-title controls">Activate unbeatable AI</button>
-        <button onClick={this.resetGame} className="header-title controls">Reset Game</button>
-        <button onClick={this.startX} className="header-title controls">Play as X</button>
-        <button onClick={this.startO} className="header-title controls">Play as O</button>
+        <a href="javascript:void(0)" onClick={this.activateAI} className="header-title controls">Activate unbeatable AI</a>
+        <a href="javascript:void(0)" onClick={this.resetGame} className="header-title controls">Reset Game</a>
+        <a href="javascript:void(0)" onClick={this.startX} className="header-title controls">Play as X</a>
+        <a href="javascript:void(0)" onClick={this.startO} className="header-title controls">Play as O</a>
         <div id="game-board">
         <h1 className="header-title game-message">{this.state.message}</h1>
           <div className={"board-row"}>
