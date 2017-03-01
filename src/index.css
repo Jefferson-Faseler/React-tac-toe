@@ -15,6 +15,11 @@ body {
   float: right;
   font-size: 15px;
   text-decoration: underline;
+  margin-right: 10px;
+}
+
+.controls:hover {
+  color: #000;
 }
 
 .controls:focus {
