@@ -27,6 +27,9 @@ class Board extends React.Component {
     this.placeMark = this.placeMark.bind(this)
     this.activateAI = this.activateAI.bind(this)
     this.handleBoardClick = this.handleBoardClick.bind(this)
+    this.handleAIClick = this.handleAIClick.bind(this)
+    this.waitEffectForUserExperience = this.waitEffectForUserExperience.bind(this)
+    this.placeComputerMark = this.placeComputerMark.bind(this)
     this.minimax = this.minimax.bind(this)
   }
 
@@ -134,29 +137,20 @@ class Board extends React.Component {
       } else {
 
         // state of currentSymbol is used because setState is asynchronous
-        this.minimax(this.state.squares, this.state.currentSymbol)
+        this.handleAIClick()
       }
       this.changeTurn()
     }
   
 
-  // handles most functionality of app
-  // finds if the square clicked is empty, if it is then
-  // appropriate symbol is placed in square and then
-  // if computer is activated it plays it's turn based on minimax minimal risk
+  // finds if the square clicked is empty, if it is
+  // appropriate symbol is placed in square and
+  // hands turn off to other player or computer
   handleBoardClick(event) {
     if (event.target.textContent === '' ) {
       this.placeMark(event.target, this.state.currentSymbol)
       if (this.state.computerPlaying) {
-        this.disableBoard()
-
-        // wait effect for user experience
-        setTimeout(function() {
-          this.minimax(this.state.squares, this.state.computerSymbol)
-
-          // enables board clicking
-          this.enableBoard()
-        }.bind(this), 1000)
+        this.handleAIClick()
       } else {
         this.changeTurn()
       }
@@ -164,33 +158,54 @@ class Board extends React.Component {
   }
 
 
+  handleAIClick() {
+    if (this.state.squares.includes(null)) {
+      this.disableBoard()
+      this.waitEffectForUserExperience(function() {
+        var index = this.minimax(this.state.squares, this.state.computerSymbol).index
+        this.placeComputerMark(index)
+        this.enableBoard()
+      }.bind(this))
+    }
+  }
+
+
+  waitEffectForUserExperience(effectThatBenefitsFromWaitExperience) {
+    setTimeout(function() {
+      effectThatBenefitsFromWaitExperience();
+    }.bind(this), 1000)
+  }
+
+
+  placeComputerMark(index) {
+    this.placeMark(document.getElementsByClassName('square')[index], this.state.computerSymbol)
+  }
+
+
   minimax(board, playerSymbol, turns = 0) {
     var opponent = playerSymbol === 'X' ? 'O' : 'X'
 
     if (this.threeInRow(board, opponent)) {
-      return -10 + turns
+      return {max: -10 + turns}
     } else if (board.includes(null) === false) {
-      return 0
+      return {max: 0}
     }
-    var max = -Infinity
-    var index = 0
+    var bestMove = {
+      max: -Infinity,
+      index: 0
+    }
     for (var i = 0; i < 9; i++) {
       if (board[i] === null) {
         var tempBoard = board.slice()
         tempBoard[i] = playerSymbol
-        var moveRating = -this.minimax(tempBoard, opponent, turns + 1)
-        if (moveRating > max) {
-          max = moveRating
-          index = i
+        var moveRating = -this.minimax(tempBoard, opponent, turns + 1).max
+        if (moveRating > bestMove.max) {
+          bestMove.max = moveRating
+          bestMove.index = i
         }
       }
     }
-    if (turns === 0) {
-      // finds the corresponding square from board with the index of the best move
-      // then passes that square and symbol to place the appropriate mark
-      this.placeMark(document.getElementsByClassName('square')[index], playerSymbol)
-    }
-    return max
+    return bestMove
   }
 
 
