@@ -141,7 +141,7 @@ class Board extends React.Component {
       }
       this.changeTurn()
     }
-
+  
 
   // finds if the square clicked is empty, if it is
   // appropriate symbol is placed in square and
