@@ -16,42 +16,26 @@ class Board extends React.Component {
       computerPlaying: false,
       message: 'Make your move'
     }
-    this.resetGame = this.resetGame.bind(this)
-    this.changeTurn = this.changeTurn.bind(this)
     this.startX = this.startX.bind(this)
     this.startO = this.startO.bind(this)
-    this.threeInRow = this.threeInRow.bind(this)
-    this.checkForWin = this.checkForWin.bind(this)
-    this.enableBoard = this.enableBoard.bind(this)
-    this.disableBoard = this.disableBoard.bind(this)
-    this.placeMark = this.placeMark.bind(this)
-    this.activateAI = this.activateAI.bind(this)
-    this.handleBoardClick = this.handleBoardClick.bind(this)
-    this.handleAIClick = this.handleAIClick.bind(this)
-    this.waitEffectForUserExperience = this.waitEffectForUserExperience.bind(this)
-    this.placeComputerMark = this.placeComputerMark.bind(this)
     this.minimax = this.minimax.bind(this)
+    this.resetGame = this.resetGame.bind(this)
+    this.placeMark = this.placeMark.bind(this)
+    this.emptyBoard = this.emptyBoard.bind(this)
+    this.changeTurn = this.changeTurn.bind(this)
+    this.threeInRow = this.threeInRow.bind(this)
+    this.activateAI = this.activateAI.bind(this)
+    this.emptySquare = this.emptySquare.bind(this)
+    this.enableBoard = this.enableBoard.bind(this)
+    this.checkForWin = this.checkForWin.bind(this)
+    this.disableBoard = this.disableBoard.bind(this)
+    this.handleAIClick = this.handleAIClick.bind(this)
+    this.updateMessage = this.updateMessage.bind(this)
+    this.handleBoardClick = this.handleBoardClick.bind(this)
+    this.placeComputerMark = this.placeComputerMark.bind(this)
+    this.emptySquareOnBoard = this.emptySquareOnBoard.bind(this)
+    this.waitEffectForUserExperience = this.waitEffectForUserExperience.bind(this)
   }
-
-
-  resetGame() {
-    this.setState({
-      squares: Array(9).fill(null),
-      currentSymbol: 'X',
-      computerSymbol: '',
-      computerPlaying: false,
-      message: 'Make your move'
-    })
-    // enables board clicking
-    document.getElementById("game-board").removeAttribute("style", "pointer-events: none;")
-  }
-
-
-  changeTurn() {
-    let currentSymbol = this.state.currentSymbol === 'X' ? 'O' : 'X'
-    this.setState({currentSymbol})
-  }
-
 
   startX() {
     this.setState({currentSymbol: 'X'})
@@ -60,58 +44,6 @@ class Board extends React.Component {
   startO() {
     this.setState({currentSymbol: 'O'})
   }
-
-
-  threeInRow(squares, currentSymbol) {
-    const winConditions = [
-    [0, 1, 2],
-    [3, 4, 5],
-    [6, 7, 8],
-    [0, 3, 6],
-    [1, 4, 7],
-    [2, 5, 8],
-    [0, 4, 8],
-    [2, 4, 6]
-    ]
-    for (var line = 0; line < winConditions.length; line++) {
-      // a,b,c are index values from a particular win condition
-      // game over if a,b,c indexes in the board contain the same
-      // values as the current symbol
-      const [a,b,c] = winConditions[line]
-      if (squares[a] === currentSymbol && squares[a] === squares[b] && squares[a] === squares[c]) {
-        return true
-      }
-    }
-    return false
-  }
-
-
-  // changes game message state based upon game conditions
-  checkForWin(currentSymbol) {
-    let gameOver = this.threeInRow(this.state.squares, currentSymbol)
-    var message
-    if (gameOver) {
-      message = 'Good job, ' + currentSymbol
-
-      this.disableBoard()
-
-    } else if (this.state.squares.includes(null)) {
-      message = currentSymbol === 'O' ? 'Your turn, X' : 'Go for it, O'
-    } else {
-      message = "Cat's game"
-    }
-    this.setState({message})
-  }
-
-
-  enableBoard() {
-    document.getElementById("game-board").removeAttribute("style", "pointer-events: none;")
-  }
-
-  disableBoard() {
-    document.getElementById("game-board").setAttribute("style", "pointer-events: none;")
-  }
-
 
   placeMark(targetSquare, symbol) {
     var square = Number(targetSquare.value)
@@ -123,31 +55,55 @@ class Board extends React.Component {
     this.checkForWin(symbol)
   }
 
-
-    activateAI() {
-      this.setState({computerPlaying: true, computerSymbol: this.state.currentSymbol})
-
-      // if nobody has played the computer places mark in random square
-      if (this.state.squares.every(i => i === null)) {
-
-        // selects random square and places mark
-        // state of currentSymbol is used because setState is asynchronous
-        this.placeMark(document.getElementsByClassName('square')[Math.floor(Math.random()*9)], this.state.currentSymbol)
-
-      } else {
-
-        // state of currentSymbol is used because setState is asynchronous
-        this.handleAIClick()
-      }
-      this.changeTurn()
+  activateAI() {
+    this.setState({computerPlaying: true, computerSymbol: this.state.currentSymbol})
+    if (this.emptyBoard()) {
+      this.placeMark(this.findSquare(Math.floor(Math.random()*9)), this.state.currentSymbol)
+    } else {
+      this.handleAIClick()
     }
-  
+    this.changeTurn()
+  }
 
-  // finds if the square clicked is empty, if it is
-  // appropriate symbol is placed in square and
-  // hands turn off to other player or computer
+  changeTurn() {
+    let currentSymbol = this.state.currentSymbol === 'X' ? 'O' : 'X'
+    this.setState({currentSymbol})
+  }
+
+
+  resetGame() {
+    this.setState({
+      squares: Array(9).fill(null),
+      currentSymbol: 'X',
+      computerSymbol: '',
+      computerPlaying: false,
+      message: 'Make your move'
+    })
+    this.enableBoard()
+  }
+
+  threeInRow(squares, currentSymbol) {
+    const winConditions = [
+      [0, 1, 2],
+      [3, 4, 5],
+      [6, 7, 8],
+      [0, 3, 6],
+      [1, 4, 7],
+      [2, 5, 8],
+      [0, 4, 8],
+      [2, 4, 6]
+    ]
+    for (var line = 0; line < winConditions.length; line++) {
+      const [a,b,c] = winConditions[line]
+      if ([squares[a], squares[b], squares[c]].every((sq)=> { return sq === currentSymbol })) {
+        return true
+      }
+    }
+    return false
+  }
+
   handleBoardClick(event) {
-    if (event.target.textContent === '' ) {
+    if (this.emptySquare(event.target)) {
       this.placeMark(event.target, this.state.currentSymbol)
       if (this.state.computerPlaying) {
         this.handleAIClick()
@@ -157,30 +113,16 @@ class Board extends React.Component {
     }
   }
 
-
   handleAIClick() {
-    if (this.state.squares.includes(null)) {
+    if (this.emptySquareOnBoard()) {
       this.disableBoard()
-      this.waitEffectForUserExperience(function() {
+      this.waitEffectForUserExperience(() => {
         var index = this.minimax(this.state.squares, this.state.computerSymbol).index
         this.placeComputerMark(index)
         this.enableBoard()
-      }.bind(this))
+      })
     }
   }
-
-
-  waitEffectForUserExperience(effectThatBenefitsFromWaitExperience) {
-    setTimeout(function() {
-      effectThatBenefitsFromWaitExperience();
-    }.bind(this), 1000)
-  }
-
-
-  placeComputerMark(index) {
-    this.placeMark(document.getElementsByClassName('square')[index], this.state.computerSymbol)
-  }
-
 
   minimax(board, playerSymbol, turns = 0) {
     var opponent = playerSymbol === 'X' ? 'O' : 'X'
@@ -209,23 +151,76 @@ class Board extends React.Component {
   }
 
 
+  checkForWin(currentSymbol) {
+    var gameOver = this.threeInRow(this.state.squares, currentSymbol)
+    var message = this.updateMessage(gameOver, currentSymbol)
+    this.setState({message})
+  }
+
+  updateMessage(gameOver, currentSymbol) {
+    if (gameOver) {
+      this.disableBoard()
+      return 'Good job, ' + currentSymbol
+    } else if (this.emptySquareOnBoard()) {
+      return currentSymbol === 'O' ? 'Your turn, X' : 'Go for it, O'
+    } else {
+      return "Cat's game"
+    }
+  }
+
+
+  enableBoard() {
+    document.getElementById("game-board").removeAttribute("style", "pointer-events: none;")
+  }
+
+  disableBoard() {
+    document.getElementById("game-board").setAttribute("style", "pointer-events: none;")
+  }
+
+  emptyBoard() {
+    return this.state.squares.every(i => i === null)
+  }
+
+  emptySquareOnBoard() {
+    return this.state.squares.includes(null)
+  }
+
+  emptySquare(square) {
+    return square.textContent === ''
+  }
+
+  waitEffectForUserExperience(effectThatBenefitsFromWaitExperience) {
+    setTimeout(() => {
+      effectThatBenefitsFromWaitExperience();
+    }, 1000)
+  }
+
+  placeComputerMark(index) {
+    this.placeMark(this.findSquare(index), this.state.computerSymbol)
+  }
+
+  findSquare(position) {
+    return document.getElementsByClassName('square')[position]
+  }
+
+
   render() {
     var chooseSymbol
 
-    if (!this.state.squares.includes('X') && !this.state.squares.includes('O')) {
+    if (this.emptyBoard()) {
       chooseSymbol = (
-      <div>
-        <a href="javascript:void(0)" onClick={this.startX} className="header-title controls">Play as X</a>
-        <a href="javascript:void(0)" onClick={this.startO} className="header-title controls">Play as O</a>
-      </div>
+        <div>
+          <a onClick={this.startX} className="header-title controls">Play as X</a>
+          <a onClick={this.startO} className="header-title controls">Play as O</a>
+        </div>
       )
     }
 
     return (
       <div>
-        <a href="javascript:void(0)" onClick={this.activateAI} className="header-title controls">Activate unbeatable AI</a>
-        <a href="javascript:void(0)" onClick={this.resetGame} className="header-title controls">Reset Game</a>
-        {chooseSymbol}
+        <a onClick={this.activateAI} className="header-title controls">Activate unbeatable AI</a>
+        <a onClick={this.resetGame} className="header-title controls">Reset Game</a>
+        { chooseSymbol }
         <div id="game-board">
         <h1 className="header-title game-message">{this.state.message}</h1>
           <div className={"board-row"}>
